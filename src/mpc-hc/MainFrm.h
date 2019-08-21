@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-HC.
  *
@@ -241,7 +241,7 @@ private:
     CComPtr<IUnknown> m_pProv;
 
     bool m_bUsingDXVA;
-    CString m_HWAccelType;
+    LPCTSTR m_HWAccelType;
     void UpdateDXVAStatus();
 
     void SetVolumeBoost(UINT nAudioBoost);
@@ -338,7 +338,7 @@ private:
 
     bool m_bRememberFilePos;
 
-    DWORD m_dwLastRun;
+    ULONGLONG m_dwLastRun;
 
     bool m_bBuffering;
 
@@ -648,6 +648,7 @@ protected:  // control bar embedded members
     DECLARE_MESSAGE_MAP()
 
 public:
+    afx_msg int OnNcCreate(LPCREATESTRUCT lpCreateStruct);
     afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
     afx_msg void OnDestroy();
 

@@ -3,7 +3,11 @@
 echo "$(pwd)" | grep -q '[[:blank:]]' &&
   echo "Out of tree builds are impossible with whitespace in source path." && exit 1
 
-bin_folder=bin
+if [ "${4}" == "VS2015" ]; then
+  bin_folder=bin15
+else
+  bin_folder=bin
+fi
 
 if [ "${1}" == "x64" ]; then
   arch=x86_64
@@ -47,7 +51,7 @@ copy_libs() {
 clean() {
   cd ${FFMPEG_BUILD_PATH}
   echo Cleaning...
-  if [ -f config.mak ]; then
+  if [ -f ffbuild/config.mak ]; then
     make distclean > /dev/null 2>&1
   fi
   cd ${BASEDIR}
@@ -68,13 +72,9 @@ configure() {
     --enable-muxer=spdif            \
     --disable-bsfs                  \
     --enable-bsf=extract_extradata,vp9_superframe \
-    --disable-hwaccels              \
-    --enable-hwaccel=h264_dxva2     \
-    --enable-hwaccel=hevc_dxva2     \
-    --enable-hwaccel=vc1_dxva2      \
-    --enable-hwaccel=wmv3_dxva2     \
-    --enable-hwaccel=mpeg2_dxva2    \
-    --enable-hwaccel=vp9_dxva2      \
+    --disable-cuda                  \
+    --disable-cuvid                 \
+    --disable-nvenc                 \
     --enable-libspeex               \
     --enable-libopencore-amrnb      \
     --enable-libopencore-amrwb      \
@@ -91,7 +91,7 @@ configure() {
     --build-suffix=-lav             \
     --arch=${arch}"
 
-  EXTRA_CFLAGS="-fno-tree-vectorize -D_WIN32_WINNT=0x0502 -DWINVER=0x0502 -I../../../thirdparty/include"
+  EXTRA_CFLAGS="-fno-tree-vectorize -D_WIN32_WINNT=0x0601 -DWINVER=0x0601 -I../../../thirdparty/include"
   EXTRA_LDFLAGS=""
   if [ "${arch}" == "x86_64" ]; then
     OPTIONS="${OPTIONS} --enable-cross-compile --cross-prefix=${cross_prefix} --target-os=mingw32 --pkg-config=pkg-config"
@@ -102,7 +102,7 @@ configure() {
     EXTRA_LDFLAGS="${EXTRA_LDFLAGS} -L../../../thirdparty/lib32"
   fi
 
-  sh ../../../ffmpeg/configure --extra-ldflags="${EXTRA_LDFLAGS}" --extra-cflags="${EXTRA_CFLAGS}" ${OPTIONS}
+  sh ../../../ffmpeg/configure --x86asmexe=yasm --extra-ldflags="${EXTRA_LDFLAGS}" --extra-cflags="${EXTRA_CFLAGS}" ${OPTIONS}
 }
 
 build() {
@@ -115,18 +115,20 @@ build() {
 configureAndBuild() {
   cd ${FFMPEG_BUILD_PATH}
   ## Don't run configure again if it was previously run
-  if [ ../../../ffmpeg/configure -ot config.mak ] &&
-     [ ../../../../build_ffmpeg.sh -ot config.mak ]; then
+  if [ ../../../ffmpeg/configure -ot ffbuild/config.mak ] &&
+     [ ../../../../build_ffmpeg.sh -ot ffbuild/config.mak ]; then
     echo Skipping configure...
   else
     echo Configuring...
 
+    ## In case of out-of-tree build this directory is created too late
+    mkdir -p ffbuild
     ## run configure, redirect to file because of a msys bug
-    configure > config.out 2>&1
+    configure > ffbuild/config.out 2>&1
     CONFIGRETVAL=$?
 
     ## show configure output
-    cat config.out
+    cat ffbuild/config.out
   fi
 
   ## Only if configure succeeded, actually build
@@ -149,7 +151,7 @@ if [ "${3}" == "Clean" ]; then
   CONFIGRETVAL=$?
 else
   ## Check if configure was previously run
-  if [ -f config.mak ]; then
+  if [ -f ffbuild/config.mak ]; then
     CLEANBUILD=0
   else
     CLEANBUILD=1

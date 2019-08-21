@@ -13,8 +13,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: MPC-HC\n"
-"POT-Creation-Date: 2017-06-03 12:18:37+0000\n"
-"PO-Revision-Date: 2017-06-03 20:15+0000\n"
+"POT-Creation-Date: 2017-08-01 20:44:32+0000\n"
+"PO-Revision-Date: 2017-08-01 22:49+0000\n"
 "Last-Translator: Luan <luanmail@gmx.net>\n"
 "Language-Team: German (http://www.transifex.com/mpc-hc/mpc-hc/language/de/)\n"
 "MIME-Version: 1.0\n"
@@ -616,8 +616,8 @@ msgid "Clip"
 msgstr "Details"
 
 msgctxt "IDC_DSSYSDEF"
-msgid "Default video renderer filter for DirectShow. Others will fall back to this one when they can't be loaded for some reason. On Windown XP this is the same as VMR-7 (windowed)."
-msgstr "Verwendet den Standard-Renderer für DirectShow-Video. Alle anderen Renderer fallen auf diesen Renderer zurück, wenn sie nicht geladen werden können. Entspricht unter Windows XP dem VMR 7 (windowed)."
+msgid "Default video renderer filter for DirectShow. Others will fall back to this one when they can't be loaded for some reason."
+msgstr "Verwendet den Standard-Renderer für DirectShow-Video. Alle anderen Renderer fallen auf diesen Renderer zurück, wenn sie nicht geladen werden können."
 
 msgctxt "IDC_DSOLD"
 msgid "This is the default renderer of Windows 9x/me/2k. Depending on the visibility of the video window and your video card's abilities, it will switch between GDI, DirectDraw, Overlay rendering modes dynamically."
@@ -632,8 +632,8 @@ msgid "Only available if you have DirectX 9 installed. Very stable but it will n
 msgstr "Arbeitet sehr stabil, bietet aber keinen Overlay-Modus und kann dadurch etwas langsamer sein. Ist nur unter DirectX 9 verfügbar."
 
 msgctxt "IDC_DSVMR9REN"
-msgid "Same as the VMR-9 (windowed), but with the Allocator-Presenter plugin of MPC-HC for subtitling. Overlay video mirroring MIGHT work. \"True Color\" desktop color space recommended. Recommended for Windows XP."
-msgstr "Bietet im Unterschied zum VMR-9 (windowed) eine Unterstützung für Untertitel. Die gespiegelte Darstellung eines Overlay-Videos KÖNNTE funktionieren. Desktop-Farbtiefe sollte auf Echtfarben eingestellt sein. Wird für Windows XP empfohlen."
+msgid "Same as the VMR-9 (windowed), but with the Allocator-Presenter plugin of MPC-HC for subtitling. Overlay video mirroring MIGHT work. \"True Color\" desktop color space recommended."
+msgstr "Bietet im Unterschied zum VMR-9 (windowed) eine Unterstützung für Untertitel. Die gespiegelte Darstellung eines Overlay-Videos KÖNNTE funktionieren. Desktop-Farbtiefe sollte auf Echtfarben eingestellt sein."
 
 msgctxt "IDC_DSDXR"
 msgid "Same as the VMR-9 (renderless), but uses a true two-pass bicubic resizer."
@@ -647,13 +647,9 @@ msgctxt "IDC_DSNULL_UNCOMP"
 msgid "Same as the normal Null renderer, but this will only connect to uncompressed types."
 msgstr "Unterstützt im Unterschied zum Null Video Renderer (anything) nur unkomprimierte Medientypen."
 
-msgctxt "IDC_DSEVR"
-msgid "Only available on Vista or later or on XP with at least .NET Framework 3.5 installed."
-msgstr "Ist generell ab Windows Vista verfügbar. Setzt unter Windows XP die Installation des .NET Framework 3.5 oder höher voraus."
-
 msgctxt "IDC_DSEVR_CUSTOM"
-msgid "Same as the EVR, but with the Allocator-Presenter of MPC-HC for subtitling and postprocessing. Recommended for Windows Vista or later."
-msgstr "Bietet im Unterschied zum EVR eine Unterstützung für Untertitel und Postprocessing. Wird ab Windows Vista empfohlen."
+msgid "Same as the EVR, but with the Allocator-Presenter of MPC-HC for subtitling and postprocessing. Recommended."
+msgstr "Bietet im Unterschied zum EVR eine Unterstützung für Untertitel und Postprocessing."
 
 msgctxt "IDC_DSMADVR"
 msgid "High-quality renderer, requires a GPU that supports D3D9 or later."
@@ -806,10 +802,6 @@ msgstr "Verwendet ohne Pixel-Shader 2.0 automatisch den einfachen bilinearer Res
 msgctxt "IDC_DSVMR9LOADMIXER"
 msgid "Puts VMR-9 (renderless) into mixer mode, this means most of the controls on its property page will work and it will use a separate worker thread to renderer frames."
 msgstr "Versetzt den VMR-9 (renderless) in den Mixer-Modus, bei dem ein separater Thread für das Rendering genutzt wird. Kann mit den meisten Ausgabe-Optionen verwendet werden."
-
-msgctxt "IDC_DSVMR9YUVMIXER"
-msgid "Improves performance at the cost of some compatibility of the renderer."
-msgstr "Verbessert die Leistung auf Kosten der Kompatibilität einiger Renderer."
 
 msgctxt "IDC_FULLSCREEN_MONITOR_CHECK"
 msgid "Reduces tearing but prevents the toolbar from being shown."
@@ -1048,11 +1040,11 @@ msgid "Scale to 16:9 TV,%.3f,%.3f,%.3f,%.3f"
 msgstr "Skalierung für 16:9-Anzeige,%.3f,%.3f,%.3f,%.3f"
 
 msgctxt "IDS_SCALE_WIDESCREEN"
-msgid "Zoom To Widescreen,%.3f,%.3f,%.3f,%.3f"
+msgid "Zoom to Widescreen,%.3f,%.3f,%.3f,%.3f"
 msgstr "Zoom für Widescreen,%.3f,%.3f,%.3f,%.3f"
 
 msgctxt "IDS_SCALE_ULTRAWIDE"
-msgid "Zoom To Ultra-Widescreen,%.3f,%.3f,%.3f,%.3f"
+msgid "Zoom to Ultra-Widescreen,%.3f,%.3f,%.3f,%.3f"
 msgstr "Zoom für Ultra-Widescreen,%.3f,%.3f,%.3f,%.3f"
 
 msgctxt "IDS_PLAYLIST_HIDEFS"
@@ -3851,9 +3843,17 @@ msgctxt "IDS_CMD_PLAYNEXT"
 msgid "/playnext\t\tOpen next file in the folder after playback"
 msgstr "/playnext\t\tÖffnet die nächste Ordnerdatei (nach Wiedergabe)."
 
+msgctxt "IDS_CMD_MUTE"
+msgid "/mute\t\tMute the audio"
+msgstr "/mute\t\tStartet den Player mit Ton aus."
+
 msgctxt "IDS_CMD_FULLSCREEN"
 msgid "/fullscreen\tStart in fullscreen mode"
 msgstr "/fullscreen\tStartet den Player im Vollbild."
+
+msgctxt "IDS_CMD_VIEWPRESET"
+msgid "/viewpreset N\tStart with specific preset,\n\t\twhere N is either \"1\" Minimal, \"2\" Compact or \"3\" Normal"
+msgstr "/viewpreset N\tStartet den Player mit Fenster-Profil N (N > 0, siehe\n\t\tAnsicht-Menü)."
 
 msgctxt "IDS_CMD_MINIMIZED"
 msgid "/minimized\tStart in minimized mode"
@@ -3870,6 +3870,10 @@ msgstr "/add\t\tFügt \"Pfadname\" zur Wiedergabeliste hinzu (auch in\n\t\tKombi
 msgctxt "IDS_CMD_RANDOMIZE"
 msgid "/randomize\tRandomize the playlist"
 msgstr "/randomize\tSortiert die Wiedergabeliste nach Zufall."
+
+msgctxt "IDS_CMD_VOLUME"
+msgid "/volume N\tSet Volume, where N is a range from 0 to 100"
+msgstr "/volume N\tStartet den Player mit Lautstärke N (N >= 0 und\n\t\tN <= 100)."
 
 msgctxt "IDS_CMD_REGVID"
 msgid "/regvid\t\tCreate file associations for video files"
@@ -3909,15 +3913,15 @@ msgstr "/monitor N\tStartet den Player auf Monitor N (N > 0)."
 
 msgctxt "IDS_CMD_AUDIORENDERER"
 msgid "/audiorenderer N\tStart using audiorenderer N, where N starts from 1 (see \"Output\" settings)"
-msgstr "/audiorenderer N\tVerwendet den Audio-Renderer N (N > 0, siehe\n\t\tAusgabe-Optionen)."
+msgstr "/audiorenderer N\tVerwendet Audio-Renderer N (N > 0, siehe\n\t\tAusgabe-Optionen)."
 
 msgctxt "IDS_CMD_SHADERPRESET"
 msgid "/shaderpreset \"Pr\"\tStart using \"Pr\" shader preset"
-msgstr "/shaderpreset \"P\"\tLädt das Shader-Profil \"P\"."
+msgstr "/shaderpreset \"P\"\tLädt Shader-Profil \"P\"."
 
 msgctxt "IDS_CMD_PNS"
-msgid "/pns \"name\"\tSpecify Pan&Scan preset name to use"
-msgstr "/pns \"P\"\t\tLädt das Pan&Scan-Profil \"P\"."
+msgid "/pns \"name\"\tSpecify Pan & Scan preset name to use"
+msgstr "/pns \"P\"\t\tLädt Pan&Scan-Profil \"P\"."
 
 msgctxt "IDS_CMD_ICONASSOC"
 msgid "/iconsassoc\tReassociate format icons"
@@ -3933,7 +3937,7 @@ msgstr "/webport N\tAktiviert das Webinterface auf Port N."
 
 msgctxt "IDS_CMD_DEBUG"
 msgid "/debug\t\tShow debug information in OSD"
-msgstr "/debug\t\tZeigt die Debug-Information im OSD an."
+msgstr "/debug\t\tZeigt die Debug-Informationen im OSD an."
 
 msgctxt "IDS_CMD_NOCRASHREPORTER"
 msgid "/nocrashreporter\tDisable the crash reporter"
@@ -3941,11 +3945,11 @@ msgstr "/nocrashreporter\tDeaktiviert die Fehlerberichterstattung."
 
 msgctxt "IDS_CMD_SLAVE"
 msgid "/slave \"hWnd\"\tUse MPC-HC as slave"
-msgstr "/slave \"H\"\t\tStartet den Player im Slave-Modus mit dem\n\t\tFensterhandle \"H\"."
+msgstr "/slave \"H\"\t\tStartet den Player im Slave-Modus mit\n\t\tFensterhandle \"H\"."
 
 msgctxt "IDS_CMD_HWGPU"
 msgid "/hwgpu \"index\"\tSet the index of the GPU used for hardware decoding.\n\t\tOnly available for CUVID and DXVA2 (copy-back)"
-msgstr "/hwgpu \"I\"\tVerwendet für das Hardware-Decoding den\n\t\tGPU-Index \"I\" (nur CUVID und DXVA2 copy-back)."
+msgstr "/hwgpu \"I\"\tVerwendet für das Hardware-Decoding GPU-Index \"I\"\n\t\t(nur CUVID und DXVA2 copy-back)."
 
 msgctxt "IDS_CMD_RESET"
 msgid "/reset\t\tRestore default settings"

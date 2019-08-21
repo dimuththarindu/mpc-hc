@@ -28,7 +28,6 @@
 #include "FakeFilterMapper2.h"
 #include "FileAssoc.h"
 #include "FileVersionInfo.h"
-#include "SysVersion.h"
 #include "Ifo.h"
 #include "MainFrm.h"
 #include "MhookHelper.h"
@@ -45,6 +44,7 @@
 #include <atlsync.h>
 #include <winternl.h>
 #include <regex>
+#include "ExceptionHandler.h"
 
 #define HOOKS_BUGS_URL _T("https://trac.mpc-hc.org/ticket/3739")
 
@@ -376,7 +376,7 @@ CStringA GetContentType(CString fn, CAtlList<CString>* redir)
         CSocket s;
         s.Create();
         if (s.Connect(
-                    ProxyEnable ? ProxyServer : url.GetHostName(),
+                    ProxyEnable ? ProxyServer.GetString() : url.GetHostName(),
                     ProxyEnable ? ProxyPort : url.GetPortNumber())) {
             CStringA host = url.GetHostName();
             CStringA path = url.GetUrlPath();
@@ -392,7 +392,7 @@ CStringA GetContentType(CString fn, CAtlList<CString>* redir)
                 "User-Agent: MPC-HC\r\n"
                 "Host: %s\r\n"
                 "Accept: */*\r\n"
-                "\r\n", path, host);
+                "\r\n", path.GetString(), host.GetString());
 
             // MessageBox(nullptr, CString(hdr), _T("Sending..."), MB_OK);
 
@@ -823,7 +823,7 @@ bool CMPlayerCApp::ExportSettings(CString savePath, CString subKey)
         if (subKey.IsEmpty()) {
             regKey.Format(_T("Software\\%s\\%s"), m_pszRegistryKey, m_pszProfileName);
         } else {
-            regKey.Format(_T("Software\\%s\\%s\\%s"), m_pszRegistryKey, m_pszProfileName, subKey);
+            regKey.Format(_T("Software\\%s\\%s\\%s"), m_pszRegistryKey, m_pszProfileName, subKey.GetString());
         }
 
         FILE* fStream;
@@ -848,13 +848,13 @@ void CMPlayerCApp::InitProfile()
 
     if (!m_pszRegistryKey) {
         // Don't reread mpc-hc.ini if the cache needs to be flushed or it was accessed recently
-        if (m_bProfileInitialized && (m_bQueuedProfileFlush || GetTickCount() - m_dwProfileLastAccessTick < 100)) {
-            m_dwProfileLastAccessTick = GetTickCount();
+        if (m_bProfileInitialized && (m_bQueuedProfileFlush || GetTickCount64() - m_dwProfileLastAccessTick < 100ULL)) {
+            m_dwProfileLastAccessTick = GetTickCount64();
             return;
         }
 
         m_bProfileInitialized = true;
-        m_dwProfileLastAccessTick = GetTickCount();
+        m_dwProfileLastAccessTick = GetTickCount64();
 
         ASSERT(m_pszProfileName);
         if (!PathUtils::Exists(m_pszProfileName)) {
@@ -925,7 +925,7 @@ void CMPlayerCApp::InitProfile()
         fpStatus = fclose(fp);
         ASSERT(fpStatus == 0);
 
-        m_dwProfileLastAccessTick = GetTickCount();
+        m_dwProfileLastAccessTick = GetTickCount64();
     }
 }
 
@@ -961,10 +961,10 @@ void CMPlayerCApp::FlushProfile(bool bForce/* = true*/)
         try {
             file.WriteString(_T("; MPC-HC\n"));
             for (auto it1 = m_ProfileMap.begin(); it1 != m_ProfileMap.end(); ++it1) {
-                line.Format(_T("[%s]\n"), it1->first);
+                line.Format(_T("[%s]\n"), it1->first.GetString());
                 file.WriteString(line);
                 for (auto it2 = it1->second.begin(); it2 != it1->second.end(); ++it2) {
-                    line.Format(_T("%s=%s\n"), it2->first, it2->second);
+                    line.Format(_T("%s=%s\n"), it2->first.GetString(), it2->second.GetString());
                     file.WriteString(line);
                 }
             }
@@ -1021,7 +1021,7 @@ BOOL CMPlayerCApp::GetProfileBinary(LPCTSTR lpszSection, LPCTSTR lpszEntry, LPBY
             }
         }
         *pBytes = length / 2;
-        *ppData = new(std::nothrow) BYTE[*pBytes];
+        *ppData = new (std::nothrow) BYTE[*pBytes];
         if (!(*ppData)) {
             ASSERT(FALSE);
             return FALSE;
@@ -1442,7 +1442,8 @@ MMRESULT WINAPI Mine_mixerSetControlDetails(HMIXEROBJ hmxobj, LPMIXERCONTROLDETA
 BOOL (WINAPI* Real_LockWindowUpdate)(HWND) = LockWindowUpdate;
 BOOL WINAPI Mine_LockWindowUpdate(HWND hWndLock)
 {
-    if (SysVersion::IsVistaOrLater() && hWndLock == ::GetDesktopWindow()) {
+    // TODO: Check if needed on Windows 8+
+    if (hWndLock == ::GetDesktopWindow()) {
         // locking the desktop window with aero active locks the entire compositor,
         // unfortunately MFC does that (when dragging CControlBar) and we want to prevent it
         return FALSE;
@@ -1459,6 +1460,9 @@ BOOL CMPlayerCApp::InitInstance()
     // At this point we have not hooked this function yet so we get the real result
     if (!IsDebuggerPresent()) {
         CrashReporter::Enable();
+        if (!CrashReporter::IsEnabled()) {
+            MPCExceptionHandler::Enable();
+        }
     }
 
     if (!HeapSetInformation(nullptr, HeapEnableTerminationOnCorruption, nullptr, 0)) {
@@ -1471,6 +1475,7 @@ BOOL CMPlayerCApp::InitInstance()
     bHookingSuccessful &= !!Mhook_SetHookEx(&Real_IsDebuggerPresent, Mine_IsDebuggerPresent);
 
     m_hNTDLL = LoadLibrary(_T("ntdll.dll"));
+#if 0
 #ifndef _DEBUG  // Disable NtQueryInformationProcess in debug (prevent VS debugger to stop on crash address)
     if (m_hNTDLL) {
         Real_NtQueryInformationProcess = (decltype(Real_NtQueryInformationProcess))GetProcAddress(m_hNTDLL, "NtQueryInformationProcess");
@@ -1479,6 +1484,7 @@ BOOL CMPlayerCApp::InitInstance()
             bHookingSuccessful &= !!Mhook_SetHookEx(&Real_NtQueryInformationProcess, Mine_NtQueryInformationProcess);
         }
     }
+#endif
 #endif
 
     bHookingSuccessful &= !!Mhook_SetHookEx(&Real_CreateFileW, Mine_CreateFileW);
@@ -2081,18 +2087,18 @@ void CRemoteCtrlClient::Connect(CString addr)
     CAutoLock cAutoLock(&m_csLock);
 
     if (m_nStatus == CONNECTING && m_addr == addr) {
-        TRACE(_T("CRemoteCtrlClient (Connect): already connecting to %s\n"), addr);
+        TRACE(_T("CRemoteCtrlClient (Connect): already connecting to %s\n"), addr.GetString());
         return;
     }
 
     if (m_nStatus == CONNECTED && m_addr == addr) {
-        TRACE(_T("CRemoteCtrlClient (Connect): already connected to %s\n"), addr);
+        TRACE(_T("CRemoteCtrlClient (Connect): already connected to %s\n"), addr.GetString());
         return;
     }
 
     m_nStatus = CONNECTING;
 
-    TRACE(_T("CRemoteCtrlClient (Connect): connecting to %s\n"), addr);
+    TRACE(_T("CRemoteCtrlClient (Connect): connecting to %s\n"), addr.GetString());
 
     Close();
 
@@ -2149,7 +2155,7 @@ void CRemoteCtrlClient::OnReceive(int nErrorCode)
     }
     str.ReleaseBuffer(ret);
 
-    TRACE(_T("CRemoteCtrlClient (OnReceive): %S\n"), str);
+    TRACE(_T("CRemoteCtrlClient (OnReceive): %S\n"), str.GetString());
 
     OnCommand(str);
 
@@ -2172,7 +2178,7 @@ void CRemoteCtrlClient::ExecuteCommand(CStringA cmd, int repcnt)
         if ((repcnt == 0 && wc.rmrepcnt == 0 || wc.rmrepcnt > 0 && (repcnt % wc.rmrepcnt) == 0)
                 && (!wc.rmcmd.CompareNoCase(cmd) || wc.cmd == (WORD)strtol(cmd, nullptr, 10))) {
             CAutoLock cAutoLock(&m_csLock);
-            TRACE(_T("CRemoteCtrlClient (calling command): %s\n"), wc.GetName());
+            TRACE(_T("CRemoteCtrlClient (calling command): %s\n"), wc.GetName().GetString());
             m_pWnd->SendMessage(WM_COMMAND, wc.cmd);
             break;
         }
@@ -2187,7 +2193,7 @@ CWinLircClient::CWinLircClient()
 
 void CWinLircClient::OnCommand(CStringA str)
 {
-    TRACE(_T("CWinLircClient (OnCommand): %S\n"), str);
+    TRACE(_T("CWinLircClient (OnCommand): %S\n"), str.GetString());
 
     int i = 0, j = 0, repcnt = 0;
     for (CStringA token = str.Tokenize(" ", i);
@@ -2209,7 +2215,7 @@ CUIceClient::CUIceClient()
 
 void CUIceClient::OnCommand(CStringA str)
 {
-    TRACE(_T("CUIceClient (OnCommand): %S\n"), str);
+    TRACE(_T("CUIceClient (OnCommand): %S\n"), str.GetString());
 
     CStringA cmd;
     int i = 0, j = 0;

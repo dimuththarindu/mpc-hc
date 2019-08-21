@@ -2,12 +2,12 @@
 # Copyright (C) 2002 - 2017 see Authors.txt
 # This file is distributed under the same license as the MPC-HC package.
 # Translators:
-# Xabier Aramendi <azpidatziak@gmail.com>, 2013-2016
+# Xabier Aramendi <azpidatziak@gmail.com>, 2013-2017
 msgid ""
 msgstr ""
 "Project-Id-Version: MPC-HC\n"
-"POT-Creation-Date: 2016-04-11 21:52:56+0000\n"
-"PO-Revision-Date: 2017-01-24 20:49+0000\n"
+"POT-Creation-Date: 2017-07-29 17:00:42+0000\n"
+"PO-Revision-Date: 2017-08-02 07:51+0000\n"
 "Last-Translator: Xabier Aramendi <azpidatziak@gmail.com>\n"
 "Language-Team: Basque (http://www.transifex.com/mpc-hc/mpc-hc/language/eu/)\n"
 "MIME-Version: 1.0\n"
@@ -337,8 +337,8 @@ msgid "Remember last window size"
 msgstr "Gogoratu azken leiho neurria"
 
 msgctxt "IDD_PPAGEPLAYER_IDC_CHECK11"
-msgid "Remember last Pan-n-Scan Zoom"
-msgstr "Gogoratu azken Pan-eta-Scan Zooma"
+msgid "Remember last Pan && Scan Zoom"
+msgstr "Gogoratu azken &Pan-eta-Scan Zooma"
 
 msgctxt "IDD_PPAGEDVD_IDC_STATIC"
 msgid "\"Open DVD/BD\" behavior"
@@ -837,8 +837,8 @@ msgid "OK"
 msgstr "Ongi"
 
 msgctxt "IDD_PNSPRESET_DLG_CAPTION"
-msgid "Pan&Scan Presets"
-msgstr "Pan-Scan Aurrezarpenak"
+msgid "Pan & Scan Presets"
+msgstr "Pan-eta-Scan Aurrezarpenak"
 
 msgctxt "IDD_PNSPRESET_DLG_IDC_BUTTON2"
 msgid "New"
@@ -1155,10 +1155,6 @@ msgstr "Aukerazko ZAldb"
 msgctxt "IDD_PPAGEOUTPUT_IDC_DSVMR9LOADMIXER"
 msgid "VMR-9 Mixer Mode"
 msgstr "VMR-9 nahastz. modua"
-
-msgctxt "IDD_PPAGEOUTPUT_IDC_DSVMR9YUVMIXER"
-msgid "YUV Mixing"
-msgstr "YUV nahasketa"
 
 msgctxt "IDD_PPAGEOUTPUT_IDC_EVR_BUFFERS_TXT"
 msgid "EVR Buffers:"
@@ -1735,6 +1731,10 @@ msgstr "Ebaketa:"
 msgctxt "IDD_PPAGEAUDIORENDERER_IDC_STATIC3"
 msgid "Level:"
 msgstr "Maila:"
+
+msgctxt "IDD_PPAGEAUDIORENDERER_IDC_CHECK4"
+msgid "Ignore system channel mixer (always ignored in exclusive WASAPI mode)"
+msgstr ""
 
 msgctxt "IDD_PPAGEAUDIORENDERER_IDC_STATIC"
 msgid "Note"

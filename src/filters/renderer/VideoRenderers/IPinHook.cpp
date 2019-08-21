@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2015 see Authors.txt
+ * (C) 2006-2015, 2017 see Authors.txt
  *
  * This file is part of MPC-HC.
  *
@@ -21,7 +21,9 @@
 
 #include "stdafx.h"
 
-#include <d3dx9.h>
+#include <d3d9.h>
+#include <d3d10.h>
+#include <dxgi.h>
 #include <dxva.h>
 #include <dxva2api.h>
 #include "moreuuids.h"
@@ -58,56 +60,56 @@ struct D3DFORMAT_TYPE {
 };
 
 const D3DFORMAT_TYPE D3DFormatType[] = {
-    { D3DFMT_UNKNOWN       , _T("D3DFMT_UNKNOWN      ") },
-    { D3DFMT_R8G8B8        , _T("D3DFMT_R8G8B8       ") },
-    { D3DFMT_A8R8G8B8      , _T("D3DFMT_A8R8G8B8     ") },
-    { D3DFMT_X8R8G8B8      , _T("D3DFMT_X8R8G8B8     ") },
-    { D3DFMT_R5G6B5        , _T("D3DFMT_R5G6B5       ") },
-    { D3DFMT_X1R5G5B5      , _T("D3DFMT_X1R5G5B5     ") },
-    { D3DFMT_A1R5G5B5      , _T("D3DFMT_A1R5G5B5     ") },
-    { D3DFMT_A4R4G4B4      , _T("D3DFMT_A4R4G4B4     ") },
-    { D3DFMT_R3G3B2        , _T("D3DFMT_R3G3B2       ") },
-    { D3DFMT_A8            , _T("D3DFMT_A8           ") },
-    { D3DFMT_A8R3G3B2      , _T("D3DFMT_A8R3G3B2     ") },
-    { D3DFMT_X4R4G4B4      , _T("D3DFMT_X4R4G4B4     ") },
-    { D3DFMT_A2B10G10R10   , _T("D3DFMT_A2B10G10R10  ") },
-    { D3DFMT_A8B8G8R8      , _T("D3DFMT_A8B8G8R8     ") },
-    { D3DFMT_X8B8G8R8      , _T("D3DFMT_X8B8G8R8     ") },
-    { D3DFMT_G16R16        , _T("D3DFMT_G16R16       ") },
-    { D3DFMT_A2R10G10B10   , _T("D3DFMT_A2R10G10B10  ") },
-    { D3DFMT_A16B16G16R16  , _T("D3DFMT_A16B16G16R16 ") },
-    { D3DFMT_A8P8          , _T("D3DFMT_A8P8         ") },
-    { D3DFMT_P8            , _T("D3DFMT_P8           ") },
-    { D3DFMT_L8            , _T("D3DFMT_L8           ") },
-    { D3DFMT_A8L8          , _T("D3DFMT_A8L8         ") },
-    { D3DFMT_A4L4          , _T("D3DFMT_A4L4         ") },
-    { D3DFMT_X8L8V8U8      , _T("D3DFMT_X8L8V8U8     ") },
-    { D3DFMT_Q8W8V8U8      , _T("D3DFMT_Q8W8V8U8     ") },
-    { D3DFMT_V16U16        , _T("D3DFMT_V16U16       ") },
-    { D3DFMT_A2W10V10U10   , _T("D3DFMT_A2W10V10U10  ") },
-    { D3DFMT_UYVY          , _T("D3DFMT_UYVY         ") },
-    { D3DFMT_R8G8_B8G8     , _T("D3DFMT_R8G8_B8G8    ") },
-    { D3DFMT_YUY2          , _T("D3DFMT_YUY2         ") },
-    { D3DFMT_G8R8_G8B8     , _T("D3DFMT_G8R8_G8B8    ") },
-    { D3DFMT_DXT1          , _T("D3DFMT_DXT1         ") },
-    { D3DFMT_DXT2          , _T("D3DFMT_DXT2         ") },
-    { D3DFMT_DXT3          , _T("D3DFMT_DXT3         ") },
-    { D3DFMT_DXT4          , _T("D3DFMT_DXT4         ") },
-    { D3DFMT_DXT5          , _T("D3DFMT_DXT5         ") },
-    { D3DFMT_D16_LOCKABLE  , _T("D3DFMT_D16_LOCKABLE ") },
-    { D3DFMT_D32           , _T("D3DFMT_D32          ") },
-    { D3DFMT_D15S1         , _T("D3DFMT_D15S1        ") },
-    { D3DFMT_D24S8         , _T("D3DFMT_D24S8        ") },
-    { D3DFMT_D24X8         , _T("D3DFMT_D24X8        ") },
-    { D3DFMT_D24X4S4       , _T("D3DFMT_D24X4S4      ") },
-    { D3DFMT_D16           , _T("D3DFMT_D16          ") },
-    { D3DFMT_D32F_LOCKABLE , _T("D3DFMT_D32F_LOCKABLE") },
-    { D3DFMT_D24FS8        , _T("D3DFMT_D24FS8       ") },
-    { D3DFMT_L16           , _T("D3DFMT_L16          ") },
-    { D3DFMT_VERTEXDATA    , _T("D3DFMT_VERTEXDATA   ") },
-    { D3DFMT_INDEX16       , _T("D3DFMT_INDEX16      ") },
-    { D3DFMT_INDEX32       , _T("D3DFMT_INDEX32      ") },
-    { D3DFMT_Q16W16V16U16  , _T("D3DFMT_Q16W16V16U16 ") },
+    { D3DFMT_UNKNOWN, _T("D3DFMT_UNKNOWN      ") },
+    { D3DFMT_R8G8B8, _T("D3DFMT_R8G8B8       ") },
+    { D3DFMT_A8R8G8B8, _T("D3DFMT_A8R8G8B8     ") },
+    { D3DFMT_X8R8G8B8, _T("D3DFMT_X8R8G8B8     ") },
+    { D3DFMT_R5G6B5, _T("D3DFMT_R5G6B5       ") },
+    { D3DFMT_X1R5G5B5, _T("D3DFMT_X1R5G5B5     ") },
+    { D3DFMT_A1R5G5B5, _T("D3DFMT_A1R5G5B5     ") },
+    { D3DFMT_A4R4G4B4, _T("D3DFMT_A4R4G4B4     ") },
+    { D3DFMT_R3G3B2, _T("D3DFMT_R3G3B2       ") },
+    { D3DFMT_A8, _T("D3DFMT_A8           ") },
+    { D3DFMT_A8R3G3B2, _T("D3DFMT_A8R3G3B2     ") },
+    { D3DFMT_X4R4G4B4, _T("D3DFMT_X4R4G4B4     ") },
+    { D3DFMT_A2B10G10R10, _T("D3DFMT_A2B10G10R10  ") },
+    { D3DFMT_A8B8G8R8, _T("D3DFMT_A8B8G8R8     ") },
+    { D3DFMT_X8B8G8R8, _T("D3DFMT_X8B8G8R8     ") },
+    { D3DFMT_G16R16, _T("D3DFMT_G16R16       ") },
+    { D3DFMT_A2R10G10B10, _T("D3DFMT_A2R10G10B10  ") },
+    { D3DFMT_A16B16G16R16, _T("D3DFMT_A16B16G16R16 ") },
+    { D3DFMT_A8P8, _T("D3DFMT_A8P8         ") },
+    { D3DFMT_P8, _T("D3DFMT_P8           ") },
+    { D3DFMT_L8, _T("D3DFMT_L8           ") },
+    { D3DFMT_A8L8, _T("D3DFMT_A8L8         ") },
+    { D3DFMT_A4L4, _T("D3DFMT_A4L4         ") },
+    { D3DFMT_X8L8V8U8, _T("D3DFMT_X8L8V8U8     ") },
+    { D3DFMT_Q8W8V8U8, _T("D3DFMT_Q8W8V8U8     ") },
+    { D3DFMT_V16U16, _T("D3DFMT_V16U16       ") },
+    { D3DFMT_A2W10V10U10, _T("D3DFMT_A2W10V10U10  ") },
+    { D3DFMT_UYVY, _T("D3DFMT_UYVY         ") },
+    { D3DFMT_R8G8_B8G8, _T("D3DFMT_R8G8_B8G8    ") },
+    { D3DFMT_YUY2, _T("D3DFMT_YUY2         ") },
+    { D3DFMT_G8R8_G8B8, _T("D3DFMT_G8R8_G8B8    ") },
+    { D3DFMT_DXT1, _T("D3DFMT_DXT1         ") },
+    { D3DFMT_DXT2, _T("D3DFMT_DXT2         ") },
+    { D3DFMT_DXT3, _T("D3DFMT_DXT3         ") },
+    { D3DFMT_DXT4, _T("D3DFMT_DXT4         ") },
+    { D3DFMT_DXT5, _T("D3DFMT_DXT5         ") },
+    { D3DFMT_D16_LOCKABLE, _T("D3DFMT_D16_LOCKABLE ") },
+    { D3DFMT_D32, _T("D3DFMT_D32          ") },
+    { D3DFMT_D15S1, _T("D3DFMT_D15S1        ") },
+    { D3DFMT_D24S8, _T("D3DFMT_D24S8        ") },
+    { D3DFMT_D24X8, _T("D3DFMT_D24X8        ") },
+    { D3DFMT_D24X4S4, _T("D3DFMT_D24X4S4      ") },
+    { D3DFMT_D16, _T("D3DFMT_D16          ") },
+    { D3DFMT_D32F_LOCKABLE, _T("D3DFMT_D32F_LOCKABLE") },
+    { D3DFMT_D24FS8, _T("D3DFMT_D24FS8       ") },
+    { D3DFMT_L16, _T("D3DFMT_L16          ") },
+    { D3DFMT_VERTEXDATA, _T("D3DFMT_VERTEXDATA   ") },
+    { D3DFMT_INDEX16, _T("D3DFMT_INDEX16      ") },
+    { D3DFMT_INDEX32, _T("D3DFMT_INDEX32      ") },
+    { D3DFMT_Q16W16V16U16, _T("D3DFMT_Q16W16V16U16 ") },
 
     { MAKEFOURCC('N', 'V', '1', '2'), _T("D3DFMT_NV12") },
     { MAKEFOURCC('N', 'V', '2', '4'), _T("D3DFMT_NV24") },
@@ -764,7 +766,7 @@ static HRESULT STDMETHODCALLTYPE GetVideoAcceleratorGUIDsMine(IAMVideoAccelerato
 
         if (pGuidsSupported) {
             for (DWORD i = 0; i < *pdwNumGuidsSupported; i++) {
-                LOG(_T("[out] pGuidsSupported[%d] = %s"), i, CStringFromGUID(pGuidsSupported[i]));
+                LOG(_T("[out] pGuidsSupported[%d] = %s"), i, CStringFromGUID(pGuidsSupported[i]).GetString());
             }
         }
     }
@@ -777,7 +779,7 @@ static HRESULT STDMETHODCALLTYPE GetUncompFormatsSupportedMine(IAMVideoAccelerat
     LOG(_T("\nGetUncompFormatsSupported"));
 
     if (pGuid) {
-        LOG(_T("[in] *pGuid = %s"), CStringFromGUID(*pGuid));
+        LOG(_T("[in] *pGuid = %s"), CStringFromGUID(*pGuid).GetString());
     }
 
     if (pdwNumFormatsSupported) {
@@ -818,7 +820,7 @@ static HRESULT STDMETHODCALLTYPE GetCompBufferInfoMine(IAMVideoAcceleratorC* Thi
         g_nDXVAVersion = 1;
 
 #ifdef _DEBUG
-        LOG(_T("[in] *pGuid = %s"), CStringFromGUID(*pGuid));
+        LOG(_T("[in] *pGuid = %s"), CStringFromGUID(*pGuid).GetString());
 
         if (pdwNumTypesCompBuffers) {
             LOG(_T("[in] *pdwNumTypesCompBuffers = %d"), *pdwNumTypesCompBuffers);
@@ -965,9 +967,9 @@ static HRESULT STDMETHODCALLTYPE ExecuteMine(IAMVideoAcceleratorC* This, DWORD d
             LOG(_T("     ConfigRequested->bConfigSpatialResidInterleaved= %d"), ConfigRequested->bConfigSpatialResidInterleaved);
             LOG(_T("     ConfigRequested->bConfigSpecificIDCT           = %d"), ConfigRequested->bConfigSpecificIDCT);
             LOG(_T("     ConfigRequested->dwFunction                    = %d"), ConfigRequested->dwFunction);
-            LOG(_T("     ConfigRequested->guidConfigBitstreamEncryption = %s"), CStringFromGUID(ConfigRequested->guidConfigBitstreamEncryption));
-            LOG(_T("     ConfigRequested->guidConfigMBcontrolEncryption = %s"), CStringFromGUID(ConfigRequested->guidConfigMBcontrolEncryption));
-            LOG(_T("     ConfigRequested->guidConfigResidDiffEncryption = %s"), CStringFromGUID(ConfigRequested->guidConfigResidDiffEncryption));
+            LOG(_T("     ConfigRequested->guidConfigBitstreamEncryption = %s"), CStringFromGUID(ConfigRequested->guidConfigBitstreamEncryption).GetString());
+            LOG(_T("     ConfigRequested->guidConfigMBcontrolEncryption = %s"), CStringFromGUID(ConfigRequested->guidConfigMBcontrolEncryption).GetString());
+            LOG(_T("     ConfigRequested->guidConfigResidDiffEncryption = %s"), CStringFromGUID(ConfigRequested->guidConfigResidDiffEncryption).GetString());
         } else
             LOG(_T("[in] lpPrivateInputData = %02x %02x %02x %02x ..."),
                 ((BYTE*)lpPrivateInputData)[0],
@@ -1370,7 +1372,8 @@ struct IDirectXVideoDecoderServiceCVtbl {
     END_INTERFACE
 };
 
-interface IDirectXVideoDecoderServiceC {
+interface IDirectXVideoDecoderServiceC
+{
     CONST_VTBL struct IDirectXVideoDecoderServiceCVtbl* lpVtbl;
 };
 
@@ -1405,9 +1408,9 @@ static void LogDXVA2Config(const DXVA2_ConfigPictureDecode* pConfig)
     LOG(_T("    - ConfigSpatialResid8               %u"), pConfig->ConfigSpatialResid8);
     LOG(_T("    - ConfigSpatialResidInterleaved     %u"), pConfig->ConfigSpatialResidInterleaved);
     LOG(_T("    - ConfigSpecificIDCT                %u"), pConfig->ConfigSpecificIDCT);
-    LOG(_T("    - guidConfigBitstreamEncryption     %s"), CStringFromGUID(pConfig->guidConfigBitstreamEncryption));
-    LOG(_T("    - guidConfigMBcontrolEncryption     %s"), CStringFromGUID(pConfig->guidConfigMBcontrolEncryption));
-    LOG(_T("    - guidConfigResidDiffEncryption     %s"), CStringFromGUID(pConfig->guidConfigResidDiffEncryption));
+    LOG(_T("    - guidConfigBitstreamEncryption     %s"), CStringFromGUID(pConfig->guidConfigBitstreamEncryption).GetString());
+    LOG(_T("    - guidConfigMBcontrolEncryption     %s"), CStringFromGUID(pConfig->guidConfigMBcontrolEncryption).GetString());
+    LOG(_T("    - guidConfigResidDiffEncryption     %s"), CStringFromGUID(pConfig->guidConfigResidDiffEncryption).GetString());
 }
 
 static void LogDXVA2VideoDesc(const DXVA2_VideoDesc* pVideoDesc)

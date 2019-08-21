@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2016 see Authors.txt
+ * (C) 2012-2017 see Authors.txt
  *
  * This file is part of MPC-HC.
  *
@@ -26,9 +26,9 @@
 #endif
 #include "mplayerc.h"
 #include "FileVersionInfo.h"
-#include "VersionInfo.h"
-#include "SysVersion.h"
 #include "PathUtils.h"
+#include "VersionInfo.h"
+#include "WinapiFunc.h"
 #include <afxole.h>
 
 
@@ -94,8 +94,13 @@ BOOL CAboutDlg::OnInitDialog()
 #error Compiler is not supported!
 #endif
 #elif defined(_MSC_VER)
-#if (_MSC_VER == 1900)                // 2015
-#if (_MSC_FULL_VER == 190024210)
+#if (_MSC_VER >= 1910)
+    m_MPCCompiler.Format(_T("MSVC v%.2d.%.2d.%.5d"), _MSC_VER / 100, _MSC_VER % 100, _MSC_FULL_VER % 100000);
+#if _MSC_BUILD
+    m_MPCCompiler.AppendFormat(_T(".%.2d"), _MSC_BUILD);
+#endif
+#elif (_MSC_VER == 1900)                // 2015
+#if (_MSC_FULL_VER >= 190024210 && _MSC_FULL_VER <= 190024218)
     m_MPCCompiler = _T("MSVC 2015 Update 3");
 #elif (_MSC_FULL_VER == 190023918)
     m_MPCCompiler = _T("MSVC 2015 Update 2");
@@ -146,7 +151,12 @@ BOOL CAboutDlg::OnInitDialog()
 
     m_buildDate = VersionInfo::GetBuildDateString();
 
-    OSVERSIONINFOEX osVersion = SysVersion::GetFullVersion();
+#pragma warning(push)
+#pragma warning(disable: 4996)
+    OSVERSIONINFOEX osVersion = { sizeof(OSVERSIONINFOEX) };
+    GetVersionEx(reinterpret_cast<LPOSVERSIONINFO>(&osVersion));
+#pragma warning(pop)
+
     m_OSName.Format(_T("Windows NT %1u.%1u (build %u"),
                     osVersion.dwMajorVersion, osVersion.dwMinorVersion, osVersion.dwBuildNumber);
     if (osVersion.szCSDVersion[0]) {
@@ -155,7 +165,14 @@ BOOL CAboutDlg::OnInitDialog()
         m_OSName += _T(")");
     }
     m_OSVersion.Format(_T("%1u.%1u"), osVersion.dwMajorVersion, osVersion.dwMinorVersion);
-    if (SysVersion::Is64Bit()) {
+
+#if !defined(_WIN64)
+    // 32-bit programs run on both 32-bit and 64-bit Windows
+    // so must sniff
+    BOOL f64 = FALSE;
+    if (IsWow64Process(GetCurrentProcess(), &f64) && f64)
+#endif
+    {
         m_OSVersion += _T(" (64-bit)");
     }
 
@@ -236,12 +253,14 @@ void CAboutDlg::OnCopyToClipboard()
             if (key.QueryStringValue(_T("ProcessorNameString"), cpuName.GetBuffer(nChars), &nChars) == ERROR_SUCCESS) {
                 cpuName.ReleaseBuffer(nChars);
                 cpuName.Trim();
-                info.AppendFormat(_T("    CPU:                %s\r\n"), cpuName);
+                info.AppendFormat(_T("    CPU:                %s\r\n"), cpuName.GetString());
             }
         }
     }
 
-    if (CComPtr<IDirect3D9> pD3D9 = Direct3DCreate9(D3D_SDK_VERSION)) {
+    const WinapiFunc<decltype(Direct3DCreate9)> fnDirect3DCreate9 = { _T("d3d9.dll"), "Direct3DCreate9" };
+    CComPtr<IDirect3D9> pD3D9;
+    if (fnDirect3DCreate9 && (pD3D9 = fnDirect3DCreate9(D3D_SDK_VERSION))) {
         for (UINT adapter = 0, adapterCount = pD3D9->GetAdapterCount(); adapter < adapterCount; adapter++) {
             D3DADAPTER_IDENTIFIER9 adapterIdentifier;
             if (pD3D9->GetAdapterIdentifier(adapter, 0, &adapterIdentifier) == D3D_OK) {
@@ -249,13 +268,13 @@ void CAboutDlg::OnCopyToClipboard()
                 deviceName.Trim();
 
                 if (adapterCount > 1) {
-                    info.AppendFormat(_T("    GPU%u:               %s"), adapter + 1, deviceName);
+                    info.AppendFormat(_T("    GPU%u:               %s"), adapter + 1, deviceName.GetString());
                 } else {
-                    info.AppendFormat(_T("    GPU:                %s"), deviceName);
+                    info.AppendFormat(_T("    GPU:                %s"), deviceName.GetString());
                 }
                 if (adapterIdentifier.DriverVersion.QuadPart) {
                     info.AppendFormat(_T(" (driver version: %s)"),
-                                      FileVersionInfo::FormatVersionString(adapterIdentifier.DriverVersion.LowPart, adapterIdentifier.DriverVersion.HighPart));
+                                      FileVersionInfo::FormatVersionString(adapterIdentifier.DriverVersion.LowPart, adapterIdentifier.DriverVersion.HighPart).GetString());
                 }
                 info += _T("\r\n");
             }

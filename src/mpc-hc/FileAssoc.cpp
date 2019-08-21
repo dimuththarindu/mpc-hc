@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014, 2016 see Authors.txt
+ * (C) 2006-2014, 2016-2017 see Authors.txt
  *
  * This file is part of MPC-HC.
  *
@@ -20,10 +20,10 @@
  */
 
 #include "stdafx.h"
+#include <VersionHelpersInternal.h>
 #include "mplayerc.h"
 #include "FileAssoc.h"
 #include "resource.h"
-#include "SysVersion.h"
 #include "PathUtils.h"
 
 
@@ -166,7 +166,7 @@ bool CFileAssoc::Register(CString ext, CString strLabel, bool bRegister, bool bR
 
     if (!bRegister) {
         // On Windows 8, an app can't set itself as the default handler for a format
-        if (!SysVersion::Is8OrLater() && bRegister != IsRegistered(ext)) {
+        if (!IsWindows8OrGreater() && bRegister != IsRegistered(ext)) {
             SetFileAssociation(ext, strProgID, bRegister);
         }
 
@@ -240,7 +240,7 @@ bool CFileAssoc::Register(CString ext, CString strLabel, bool bRegister, bool bR
 
                 /* icon_index value -1 means no icon was found in the iconlib for the file extension */
                 if (iconIndex >= 0 && ExtractIcon(AfxGetApp()->m_hInstance, m_iconLibPath, iconIndex)) {
-                    appIcon.Format(_T("\"%s\",%d"), m_iconLibPath, iconIndex);
+                    appIcon.Format(_T("\"%s\",%d"), m_iconLibPath.GetString(), iconIndex);
                 }
             }
 
@@ -255,7 +255,7 @@ bool CFileAssoc::Register(CString ext, CString strLabel, bool bRegister, bool bR
         }
 
         // On Windows 8, an app can't set itself as the default handler for a format
-        if (!SysVersion::Is8OrLater() && bRegister != IsRegistered(ext)) {
+        if (!IsWindows8OrGreater() && bRegister != IsRegistered(ext)) {
             SetFileAssociation(ext, strProgID, bRegister);
         }
 
@@ -386,7 +386,7 @@ bool CFileAssoc::IsRegistered(CString ext) const
     BOOL bIsDefault = FALSE;
     CString strProgID = PROGID + ext;
 
-    if (SysVersion::Is8OrLater()) {
+    if (IsWindows8OrGreater()) {
         // The Eight way
         bIsDefault = TRUE; // Check only if MPC-HC is registered as able to handle that format, not if it's the default.
     } else if (m_pAAR) {
@@ -739,7 +739,7 @@ bool CFileAssoc::ReAssocIcons(const CAtlList<CString>& exts)
 
         /* icon_index value -1 means no icon was found in the iconlib for the file extension */
         if (iconIndex >= 0 && ExtractIcon(AfxGetApp()->m_hInstance, m_iconLibPath, iconIndex)) {
-            appIcon.Format(_T("\"%s\",%d"), m_iconLibPath, iconIndex);
+            appIcon.Format(_T("\"%s\",%d"), m_iconLibPath.GetString(), iconIndex);
         }
 
         /* no icon was found for the file extension, so use MPC-HC's icon */
@@ -778,7 +778,7 @@ void CFileAssoc::CheckIconsAssocThread()
 
         if (nCurrentVersion != nLastVersion && GetAssociatedExtensionsFromRegistry(registeredExts)) {
             iconLib->SaveVersion();
-            if (SysVersion::IsVistaOrLater() && !IsUserAnAdmin()) {
+            if (!IsUserAnAdmin()) {
                 TASKDIALOGCONFIG config;
                 ZeroMemory(&config, sizeof(TASKDIALOGCONFIG));
                 config.cbSize = sizeof(config);

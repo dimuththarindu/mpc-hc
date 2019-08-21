@@ -4,12 +4,12 @@
 # Translators:
 # geogeo.gr <geogeo.gr@gmail.com>, 2013-2014
 # firespin <dartworldgr@hotmail.com>, 2014
-# geogeo.gr <geogeo.gr@gmail.com>, 2015
+# geogeo.gr <geogeo.gr@gmail.com>, 2015,2017
 msgid ""
 msgstr ""
 "Project-Id-Version: MPC-HC\n"
-"POT-Creation-Date: 2015-07-20 20:29:41+0000\n"
-"PO-Revision-Date: 2015-10-20 10:53+0000\n"
+"POT-Creation-Date: 2017-07-30 20:54:11+0000\n"
+"PO-Revision-Date: 2017-07-31 11:52+0000\n"
 "Last-Translator: geogeo.gr <geogeo.gr@gmail.com>\n"
 "Language-Team: Greek (http://www.transifex.com/mpc-hc/mpc-hc/language/el/)\n"
 "MIME-Version: 1.0\n"
@@ -23,8 +23,8 @@ msgid "This will install [name] on your computer.\n\nIt is recommended that you 
 msgstr "Θα γίνει εγκατάσταση του [name] στον υπολογιστή σας.\n\nΣας συνιστούμε να κλείσετε κάθε άλλη εφαρμογή πριν συνεχίσετε."
 
 msgctxt "Messages_WinVersionTooLowError"
-msgid "[name] requires Windows XP Service Pack 3 or newer to run."
-msgstr "Το [name] χρειάζεται Windows XP Service Pack 3 ή νεότερο για να λειτουργήσει."
+msgid "[name] requires Windows Vista or newer to run."
+msgstr "Το [name] απαιτεί Windows Vista ή νεότερα για να λειτουργήσει."
 
 msgctxt "CustomMessages_comp_mpciconlib"
 msgid "Icon Library"
@@ -37,10 +37,6 @@ msgstr "Μεταφράσεις"
 msgctxt "CustomMessages_msg_DeleteSettings"
 msgid "Do you also want to delete MPC-HC settings?\n\nIf you plan on installing MPC-HC again then you do not have to delete them."
 msgstr "Θέλετε να διαγράψετε τις ρυθμίσεις του MPC-HC;\n\nΑν σκοπεύετε να εγκαταστήσετε το MPC-HC ξανά, τότε δεν χρειάζεται να τις διαγράψετε."
-
-msgctxt "CustomMessages_msg_simd_sse"
-msgid "This build of MPC-HC requires a CPU with SSE extension support.\n\nYour CPU does not have those capabilities."
-msgstr "Αυτή η έκδοση του MPC-HC απαιτεί επεξεργαστή με υποστήριξη SSE.\n\nΟ επεξεργαστής σας δεν έχει αυτές τις δυνατότητες."
 
 msgctxt "CustomMessages_msg_simd_sse2"
 msgid "This build of MPC-HC requires a CPU with SSE2 extension support.\n\nYour CPU does not have those capabilities."

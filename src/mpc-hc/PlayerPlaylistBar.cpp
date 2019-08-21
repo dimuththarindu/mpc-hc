@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-HC.
  *
@@ -307,7 +307,7 @@ void CPlayerPlaylistBar::ParsePlayList(CAtlList<CString>& fns, CAtlList<CString>
         return;
     } else {
 #if INTERNAL_SOURCEFILTER_MPEG
-        if (ct == "application/x-bdmv-playlist" && s.SrcFilters[SRC_MPEG]) {
+        if (ct == "application/x-bdmv-playlist" && (s.SrcFilters[SRC_MPEG] || s.SrcFilters[SRC_MPEGTS])) {
             ParseBDMVPlayList(fns.GetHead());
             return;
         }
@@ -1126,11 +1126,10 @@ void CPlayerPlaylistBar::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruc
         textcolor |= 0xA0A0A0;
     }
 
-    CString time = !pli.m_fInvalid ? m_list.GetItemText(nItem, COL_TIME) : _T("Invalid");
-    CSize timesize(0, 0);
+    CString time = !pli.m_fInvalid ? m_list.GetItemText(nItem, COL_TIME) : CString(_T("Invalid"));
     CPoint timept(rcItem.right, 0);
     if (!time.IsEmpty()) {
-        timesize = pDC->GetTextExtent(time);
+        CSize timesize = pDC->GetTextExtent(time);
         if ((3 + timesize.cx + 3) < rcItem.Width() / 2) {
             timept = CPoint(rcItem.right - (3 + timesize.cx + 3), (rcItem.top + rcItem.bottom - timesize.cy) / 2);
 
@@ -1141,7 +1140,7 @@ void CPlayerPlaylistBar::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruc
 
     CString fmt, file;
     fmt.Format(_T("%%0%dd. %%s"), (int)log10(0.1 + m_pl.GetCount()) + 1);
-    file.Format(fmt, nItem + 1, m_list.GetItemText(nItem, COL_NAME));
+    file.Format(fmt, nItem + 1, m_list.GetItemText(nItem, COL_NAME).GetString());
     CSize filesize = pDC->GetTextExtent(file);
     while (3 + filesize.cx + 6 > timept.x && file.GetLength() > 3) {
         file = file.Left(file.GetLength() - 4) + _T("...");
@@ -1621,11 +1620,16 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint point)
             }
 
             CTextFile::enc encoding = (CTextFile::enc)fd.GetEncoding();
-            if (encoding == CTextFile::DEFAULT_ENCODING) {
-                encoding = CTextFile::ANSI;
-            }
 
             int idx = fd.m_pOFN->nFilterIndex;
+
+            if (encoding == CTextFile::DEFAULT_ENCODING) {
+                if (idx == 1 || idx == 3) {
+                    encoding = CTextFile::UTF8;
+                } else {
+                    encoding = CTextFile::ANSI;
+                }
+            }
 
             CPath path(fd.GetPathName());
 
@@ -1724,13 +1728,13 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint point)
 
                 switch (idx) {
                     case 2:
-                        str.Format(_T("File%d=%s\n"), i + 1, fn);
+                        str.Format(_T("File%d=%s\n"), i + 1, fn.GetString());
                         break;
                     case 3:
-                        str.Format(_T("%s\n"), fn);
+                        str.Format(_T("%s\n"), fn.GetString());
                         break;
                     case 4:
-                        str.Format(_T("<Entry><Ref href = \"%s\"/></Entry>\n"), fn);
+                        str.Format(_T("<Entry><Ref href = \"%s\"/></Entry>\n"), fn.GetString());
                         break;
                     default:
                         break;

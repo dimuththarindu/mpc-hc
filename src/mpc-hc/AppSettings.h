@@ -86,7 +86,12 @@ enum : UINT64 {
     CLSW_SLAVE = CLSW_ADMINOPTION << 1,
     CLSW_AUDIORENDERER = CLSW_SLAVE << 1,
     CLSW_RESET = CLSW_AUDIORENDERER << 1,
-    CLSW_UNRECOGNIZEDSWITCH = CLSW_RESET << 1 // 35
+    CLSW_PRESET1 = CLSW_RESET << 1,
+    CLSW_PRESET2 = CLSW_PRESET1 << 1,
+    CLSW_PRESET3 = CLSW_PRESET2 << 1,
+    CLSW_MUTE = CLSW_PRESET3 << 1,
+    CLSW_VOLUME = CLSW_MUTE << 1,
+    CLSW_UNRECOGNIZEDSWITCH = CLSW_VOLUME << 1 // 40
 };
 
 enum MpcCaptionState {
@@ -271,17 +276,17 @@ struct wmcmd_base : public ACCEL {
 
     wmcmd_base()
         : ACCEL( { 0, 0, 0 })
-    , dwname(0)
-    , appcmd(0)
     , mouse(NONE)
-    , mouseFS(NONE) {}
+    , mouseFS(NONE)
+    , dwname(0)
+    , appcmd(0) {}
 
     constexpr wmcmd_base(WORD _cmd, WORD _key, BYTE _fVirt, DWORD _dwname, UINT _appcmd = 0, BYTE _mouse = NONE, BYTE _mouseFS = NONE)
         : ACCEL{ _fVirt, _key, _cmd }
-        , dwname(_dwname)
-        , appcmd(_appcmd)
         , mouse(_mouse)
-        , mouseFS(_mouseFS) {}
+        , mouseFS(_mouseFS)
+        , dwname(_dwname)
+        , appcmd(_appcmd) {}
 
     constexpr wmcmd_base(const wmcmd_base&) = default;
     constexpr wmcmd_base(wmcmd_base&&) = default;
@@ -707,6 +712,7 @@ public:
     CComPtr<SaneAudioRenderer::ISettings> sanear;
 
     DWORD           iLAVGPUDevice;
+    unsigned        nCmdVolume;
 
     enum class SubtitleRenderer {
         INTERNAL,

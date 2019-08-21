@@ -1,5 +1,5 @@
 /*
- * (C) 2011-2015 see Authors.txt
+ * (C) 2011-2015, 2017 see Authors.txt
  *
  * This file is part of MPC-HC.
  *
@@ -19,10 +19,9 @@
  */
 
 #include "stdafx.h"
-#include <d3dx9.h>
+#include <d3d9.h>
 #include <Shlobj.h>
 #include "WinAPIUtils.h"
-#include "SysVersion.h"
 #include "PathUtils.h"
 
 
@@ -100,7 +99,7 @@ bool ExportRegistryKey(CStdioFile& file, HKEY hKeyRoot, CString keyName)
 
     CString buffer;
 
-    buffer.Format(_T("[%s\\%s]\n"), GetHiveName(hKeyRoot), keyName);
+    buffer.Format(_T("[%s\\%s]\n"), GetHiveName(hKeyRoot).GetString(), keyName.GetString());
     file.WriteString(buffer);
 
     CString valueName;
@@ -122,12 +121,12 @@ bool ExportRegistryKey(CStdioFile& file, HKEY hKeyRoot, CString keyName)
                 CString str((TCHAR*)data);
                 str.Replace(_T("\\"), _T("\\\\"));
                 str.Replace(_T("\""), _T("\\\""));
-                buffer.Format(_T("\"%s\"=\"%s\"\n"), valueName, str);
+                buffer.Format(_T("\"%s\"=\"%s\"\n"), valueName.GetString(), str.GetString());
                 file.WriteString(buffer);
             }
             break;
             case REG_BINARY:
-                buffer.Format(_T("\"%s\"=hex:%02x"), valueName, data[0]);
+                buffer.Format(_T("\"%s\"=hex:%02x"), valueName.GetString(), data[0]);
                 file.WriteString(buffer);
                 for (DWORD i = 1; i < valueDataLen; i++) {
                     buffer.Format(_T(",%02x"), data[i]);
@@ -136,13 +135,13 @@ bool ExportRegistryKey(CStdioFile& file, HKEY hKeyRoot, CString keyName)
                 file.WriteString(_T("\n"));
                 break;
             case REG_DWORD:
-                buffer.Format(_T("\"%s\"=dword:%08lx\n"), valueName, *((DWORD*)data));
+                buffer.Format(_T("\"%s\"=dword:%08lx\n"), valueName.GetString(), *((DWORD*)data));
                 file.WriteString(buffer);
                 break;
             default: {
                 CString msg;
                 msg.Format(_T("The value \"%s\\%s\\%s\" has an unsupported type and has been ignored.\nPlease report this error to the developers."),
-                           GetHiveName(hKeyRoot), keyName, valueName);
+                           GetHiveName(hKeyRoot).GetString(), keyName.GetString(), valueName.GetString());
                 AfxMessageBox(msg, MB_ICONERROR | MB_OK);
             }
             delete [] data;
@@ -166,7 +165,7 @@ bool ExportRegistryKey(CStdioFile& file, HKEY hKeyRoot, CString keyName)
             return false;
         }
 
-        buffer.Format(_T("%s\\%s"), keyName, subKeyName);
+        buffer.Format(_T("%s\\%s"), keyName.GetString(), subKeyName.GetString());
 
         if (!ExportRegistryKey(file, hKeyRoot, buffer)) {
             return false;
@@ -212,9 +211,6 @@ namespace
     {
         ZeroMemory(ncm, sizeof(NONCLIENTMETRICS));
         ncm->cbSize = sizeof(NONCLIENTMETRICS);
-        if (!SysVersion::IsVistaOrLater()) {
-            ncm->cbSize -= sizeof(ncm->iPaddedBorderWidth);
-        }
         VERIFY(SystemParametersInfo(SPI_GETNONCLIENTMETRICS, ncm->cbSize, ncm, 0));
     }
 }
@@ -304,6 +300,6 @@ HRESULT FileDelete(CString file, HWND hWnd, bool recycle /*= true*/)
     if (fileOpStruct.fAnyOperationsAborted) {
         hRes = E_ABORT;
     }
-    TRACE(_T("Delete recycle=%d hRes=0x%08x, file=%s\n"), recycle, hRes, file);
+    TRACE(_T("Delete recycle=%d hRes=0x%08x, file=%s\n"), recycle, hRes, file.GetString());
     return hRes;
 }

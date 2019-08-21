@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2015 see Authors.txt
+ * (C) 2006-2015, 2017 see Authors.txt
  *
  * This file is part of MPC-HC.
  *
@@ -480,10 +480,10 @@ HRESULT CStreamSwitcherInputPin::InitializeOutputSample(IMediaSample* pInSample,
         dwFlags |= AM_GBF_NOTASYNCPOINT;
     }
 
-    HRESULT hr = pOut->GetDeliveryBuffer(&pOutSample
-                                         , m_SampleProps.dwSampleFlags & AM_SAMPLE_TIMEVALID ? &m_SampleProps.tStart : nullptr
-                                         , m_SampleProps.dwSampleFlags & AM_SAMPLE_STOPVALID ? &m_SampleProps.tStop : nullptr
-                                         , dwFlags);
+    HRESULT hr = pOut->GetDeliveryBuffer(&pOutSample,
+                                         (m_SampleProps.dwSampleFlags & AM_SAMPLE_TIMEVALID) ? &m_SampleProps.tStart : nullptr,
+                                         (m_SampleProps.dwSampleFlags & AM_SAMPLE_STOPVALID) ? &m_SampleProps.tStop : nullptr,
+                                         dwFlags);
 
     if (FAILED(hr)) {
         return hr;
@@ -742,7 +742,7 @@ STDMETHODIMP CStreamSwitcherInputPin::BeginFlush()
         return hr;
     }
 
-    return IsActive() ? pSSF->DeliverBeginFlush() : Block(false), S_OK;
+    return IsActive() ? pSSF->DeliverBeginFlush() : (Block(false), S_OK);
 }
 
 STDMETHODIMP CStreamSwitcherInputPin::EndFlush()
@@ -762,7 +762,7 @@ STDMETHODIMP CStreamSwitcherInputPin::EndFlush()
         return hr;
     }
 
-    return IsActive() ? pSSF->DeliverEndFlush() : Block(true), S_OK;
+    return IsActive() ? pSSF->DeliverEndFlush() : (Block(true), S_OK);
 }
 
 STDMETHODIMP CStreamSwitcherInputPin::EndOfStream()

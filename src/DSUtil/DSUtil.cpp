@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-HC.
  *
@@ -27,7 +27,9 @@
 #include "DSUtil.h"
 #include "Mpeg2Def.h"
 #include <emmintrin.h>
-#include <d3d9types.h>
+#include <d3d9.h>
+#include <d3d10.h>
+#include <dxgi.h>
 #include "NullRenderers.h"
 
 #include <initguid.h>
@@ -789,7 +791,7 @@ OpticalDiskType_t GetOpticalDiskType(TCHAR drive, CAtlList<CString>& files)
                     trackData.Control &= 5;
                     if (trackData.Control == 0 || trackData.Control == 1) {
                         CString fn;
-                        fn.Format(_T("%s\\track%02Id.cda"), path, i);
+                        fn.Format(_T("%s\\track%02Id.cda"), path.GetString(), i);
                         files.AddTail(fn);
                     }
                 }
@@ -917,35 +919,7 @@ REFERENCE_TIME HMSF2RT(DVD_HMSF_TIMECODE hmsf, double fps /*= -1.0*/)
 void memsetd(void* dst, unsigned int c, size_t nbytes)
 {
     size_t n = nbytes / 4;
-
-#if defined(_M_IX86_FP) && _M_IX86_FP < 2
-    if (!(g_cpuid.m_flags & g_cpuid.sse2)) { // No SSE2
-        __stosd((unsigned long*)dst, c, n);
-        return;
-    }
-#endif
-
-    size_t o = n - (n % 4);
-
-    __m128i val = _mm_set1_epi32((int)c);
-    if (((uintptr_t)dst & 0x0F) == 0) { // 16-byte aligned
-        for (size_t i = 0; i < o; i += 4) {
-            _mm_store_si128((__m128i*) & (((DWORD*)dst)[i]), val);
-        }
-    } else {
-        for (size_t i = 0; i < o; i += 4) {
-            _mm_storeu_si128((__m128i*) & (((DWORD*)dst)[i]), val);
-        }
-    }
-
-    switch (n - o) {
-        case 3:
-            ((DWORD*)dst)[o + 2] = c;
-        case 2:
-            ((DWORD*)dst)[o + 1] = c;
-        case 1:
-            ((DWORD*)dst)[o + 0] = c;
-    }
+    __stosd((unsigned long*)dst, c, n);
 }
 
 void memsetw(void* dst, unsigned short c, size_t nbytes)
@@ -1352,7 +1326,7 @@ CString MakeFullPath(LPCTSTR path)
 CString GetMediaTypeName(const GUID& guid)
 {
     CString ret = guid == GUID_NULL
-                  ? _T("Any type")
+                  ? CString(_T("Any type"))
                   : CString(GuidNames[guid]);
 
     if (ret == _T("FOURCC GUID")) {

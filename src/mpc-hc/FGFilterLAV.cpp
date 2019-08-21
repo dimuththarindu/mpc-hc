@@ -1,5 +1,5 @@
 /*
- * (C) 2013-2016 see Authors.txt
+ * (C) 2013-2017 see Authors.txt
  *
  * This file is part of MPC-HC.
  *
@@ -21,7 +21,6 @@
 #include "stdafx.h"
 #include "mplayerc.h"
 #include "PathUtils.h"
-#include "SysVersion.h"
 #include "../filters/InternalPropertyPage.h"
 #include "../filters/PinInfoWnd.h"
 #include <FileVersionInfo.h>
@@ -141,7 +140,7 @@ CString CFGFilterLAV::GetVersion(LAVFILTER_TYPE filterType /*= INVALID*/)
     if (uiVersionMin != UINT64_MAX) {
         version = strVersionMin;
         if (uiVersionMax != uiVersionMin) {
-            version.AppendFormat(_T(" - %s"), strVersionMax);
+            version.AppendFormat(_T(" - %s"), strVersionMax.GetString());
         }
     }
 
@@ -557,24 +556,27 @@ void CFGFilterLAVVideo::ShowPropertyPages(CWnd* pParendWnd)
     CFGFilterLAV::ShowPropertyPages<VIDEO_DECODER, CFGFilterLAVVideo, ILAVVideoSettings, 1>(pParendWnd);
 }
 
-LPCTSTR CFGFilterLAVVideo::GetUserFriendlyDecoderName(const CString& decoderName)
+LPCTSTR CFGFilterLAVVideo::GetUserFriendlyDecoderName(const LPCWSTR decoderName)
 {
-    static std::pair<LPCTSTR, LPCTSTR> userFriendlyDecoderNames[] = {
-        std::make_pair(_T("avcodec"), _T("FFmpeg")),
-        std::make_pair(_T("dxva2n"), _T("DXVA2 Native")),
-        std::make_pair(_T("dxva2cb"), _T("DXVA2 Copy-back")),
-        std::make_pair(_T("dxva2cb direct"), _T("DXVA2 Copy-back (Direct)")),
-        std::make_pair(_T("cuvid"), _T("NVIDIA CUVID")),
-        std::make_pair(_T("quicksync"), _T("Intel QuickSync"))
+    static constexpr std::pair<const LPCWSTR, const LPCTSTR> userFriendlyDecoderNames[] = {
+        std::make_pair(L"avcodec", _T("FFmpeg")),
+        std::make_pair(L"dxva2n", _T("DXVA2 Native")),
+        std::make_pair(L"dxva2cb", _T("DXVA2 Copy-back")),
+        std::make_pair(L"dxva2cb direct", _T("DXVA2 Copy-back (Direct)")),
+        std::make_pair(L"cuvid", _T("NVIDIA CUVID")),
+        std::make_pair(L"quicksync", _T("Intel QuickSync")),
+        std::make_pair(L"d3d11 cb direct", _T("D3D11 Copy-back (Direct)")),
+        std::make_pair(L"d3d11 cb", _T("D3D11 Copy-back")),
+        std::make_pair(L"d3d11 native", _T("D3D11 Native")),
     };
 
-    for (int i = 0; i < _countof(userFriendlyDecoderNames); i++) {
-        if (decoderName == userFriendlyDecoderNames[i].first) {
-            return userFriendlyDecoderNames[i].second;
+    for (const auto& name : userFriendlyDecoderNames) {
+        if (wcscmp(decoderName, name.first) == 0) {
+            return name.second;
         }
     }
 
-    return _T("None");
+    return decoderName;
 }
 
 static LPCTSTR pixFmtSettingsMap[LAVOutPixFmt_NB] = {
@@ -612,25 +614,7 @@ void CFGFilterLAVVideo::Settings::LoadSettings()
 
     dwHWAccel = pApp->GetProfileInt(IDS_R_INTERNAL_LAVVIDEO_HWACCEL, _T("HWAccel"), -1);
     if (dwHWAccel == DWORD(-1)) {
-        dwHWAccel = HWAccel_None; // Ensure that a valid state is selected if no HW acceleration is available
-
-        // We enable by default DXVA2 native on Vista+ and CUVID on XP if an NVIDIA adapter is found
-        if (SysVersion::IsVistaOrLater()) {
-            dwHWAccel = HWAccel_DXVA2Native;
-        } else {
-            CComPtr<IDirect3D9> pD3D9 = Direct3DCreate9(D3D_SDK_VERSION);
-            if (pD3D9) {
-                D3DADAPTER_IDENTIFIER9 adapterIdentifier;
-
-                for (UINT adp = 0, num_adp = pD3D9->GetAdapterCount(); adp < num_adp; ++adp) {
-                    if (pD3D9->GetAdapterIdentifier(adp, 0, &adapterIdentifier) == S_OK
-                            && adapterIdentifier.VendorId == 0x10DE) {
-                        dwHWAccel = HWAccel_CUDA;
-                        break;
-                    }
-                }
-            }
-        }
+        dwHWAccel = HWAccel_DXVA2Native;
     }
 
     bHWFormats[HWCodec_H264] = pApp->GetProfileInt(IDS_R_INTERNAL_LAVVIDEO_HWACCEL, _T("h264"), bHWFormats[HWCodec_H264]);

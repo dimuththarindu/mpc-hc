@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2013 see Authors.txt
+ * (C) 2006-2013, 2017 see Authors.txt
  *
  * This file is part of MPC-HC.
  *
@@ -71,7 +71,7 @@ public:
 class CMatroskaMuxerOutputPin : public CBaseOutputPin
 {
 public:
-    CMatroskaMuxerOutputPin(TCHAR* pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr);
+    CMatroskaMuxerOutputPin(LPCTSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr);
     virtual ~CMatroskaMuxerOutputPin();
 
     DECLARE_IUNKNOWN;
@@ -86,8 +86,9 @@ public:
 };
 
 interface __declspec(uuid("38E2D43D-915D-493C-B373-888DB16EE3DC"))
-IMatroskaMuxer :
-public IUnknown {
+    IMatroskaMuxer :
+    public IUnknown
+{
     STDMETHOD(CorrectTimeOffset)(bool fNegative, bool fPositive) PURE;
     // TODO: chapters
 };

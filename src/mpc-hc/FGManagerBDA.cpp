@@ -24,7 +24,6 @@
 #include "MainFrm.h"
 #include "Logger.h"
 #include <ISOLang.h>
-#include <SysVersion.h>
 #include <moreuuids.h>
 #include <dvdmedia.h>
 #include <ks.h>
@@ -342,13 +341,7 @@ CFGManagerBDA::CFGManagerBDA(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd)
     m_DVBStreams[DVB_PSI]  = CDVBStream(L"psi",  &mt_Psi, true, MEDIA_MPEG2_PSI);
     m_DVBStreams[DVB_TIF]  = CDVBStream(L"tif",  &mt_Tif, true);
     m_DVBStreams[DVB_EPG]  = CDVBStream(L"epg",  &mt_Epg);
-
-    // Warning : MEDIA_ELEMENTARY_STREAM didn't work for subtitles with Windows XP!
-    if (SysVersion::IsVistaOrLater()) {
-        m_DVBStreams[DVB_SUB] = CDVBStream(L"sub", &mt_Subtitle/*, false, MEDIA_TRANSPORT_PAYLOAD*/);
-    } else {
-        m_DVBStreams[DVB_SUB] = CDVBStream(L"sub", &mt_Subtitle, false, MEDIA_TRANSPORT_PAYLOAD);
-    }
+    m_DVBStreams[DVB_SUB] = CDVBStream(L"sub", &mt_Subtitle/*, false, MEDIA_TRANSPORT_PAYLOAD*/);
 
     if (pChannel) {
         m_nCurVideoType = pChannel->GetVideoType();
@@ -988,7 +981,7 @@ HRESULT CFGManagerBDA::CreateMicrosoftDemux(CComPtr<IBaseFilter>& pMpeg2Demux)
             case DVB_PSI:
                 if (!Stream.GetFindExisting() ||
                         (pPin = FindPin(pMpeg2Demux, PINDIR_OUTPUT, Stream.GetMediaType())) == nullptr) {
-                    CheckNoLog(pDemux->CreateOutputPin((AM_MEDIA_TYPE*)Stream.GetMediaType(), Stream.GetName(), &pPin));
+                    CheckNoLog(pDemux->CreateOutputPin(const_cast<AM_MEDIA_TYPE*>(Stream.GetMediaType()), const_cast<LPWSTR>(Stream.GetName()), &pPin));
                 }
                 CheckNoLog(Connect(pPin, nullptr, false));
                 Stream.SetPin(pPin);
@@ -1001,7 +994,7 @@ HRESULT CFGManagerBDA::CreateMicrosoftDemux(CComPtr<IBaseFilter>& pMpeg2Demux)
                 if ((nType == m_nCurVideoType) || (m_nDVBRebuildFilterGraph == DVB_REBUILD_FG_NEVER)) {
                     if (!Stream.GetFindExisting() ||
                             (pPin = FindPin(pMpeg2Demux, PINDIR_OUTPUT, Stream.GetMediaType())) == nullptr) {
-                        CheckNoLog(pDemux->CreateOutputPin((AM_MEDIA_TYPE*)Stream.GetMediaType(), Stream.GetName(), &pPin));
+                        CheckNoLog(pDemux->CreateOutputPin(const_cast<AM_MEDIA_TYPE*>(Stream.GetMediaType()), const_cast<LPWSTR>(Stream.GetName()), &pPin));
                     }
                     if (m_nCurVideoType == nType) {
                         CheckNoLog(Connect(pPin, nullptr, true));
@@ -1023,7 +1016,7 @@ HRESULT CFGManagerBDA::CreateMicrosoftDemux(CComPtr<IBaseFilter>& pMpeg2Demux)
                         (bAudioEAC3 && (nType == DVB_EAC3)) || (bAudioLATM && (nType == DVB_LATM))) {
                     if (!Stream.GetFindExisting() ||
                             (pPin = FindPin(pMpeg2Demux, PINDIR_OUTPUT, Stream.GetMediaType())) == nullptr) {
-                        CheckNoLog(pDemux->CreateOutputPin((AM_MEDIA_TYPE*)Stream.GetMediaType(), Stream.GetName(), &pPin));
+                        CheckNoLog(pDemux->CreateOutputPin(const_cast<AM_MEDIA_TYPE*>(Stream.GetMediaType()), const_cast<LPWSTR>(Stream.GetName()), &pPin));
                     }
                     if (m_nCurAudioType == nType) {
                         CheckNoLog(Connect(pPin, nullptr, true));
@@ -1040,7 +1033,7 @@ HRESULT CFGManagerBDA::CreateMicrosoftDemux(CComPtr<IBaseFilter>& pMpeg2Demux)
             case DVB_SUB:
                 if (!Stream.GetFindExisting() ||
                         (pPin = FindPin(pMpeg2Demux, PINDIR_OUTPUT, Stream.GetMediaType())) == nullptr) {
-                    CheckNoLog(pDemux->CreateOutputPin((AM_MEDIA_TYPE*)Stream.GetMediaType(), Stream.GetName(), &pPin));
+                    CheckNoLog(pDemux->CreateOutputPin(const_cast<AM_MEDIA_TYPE*>(Stream.GetMediaType()), const_cast<LPWSTR>(Stream.GetName()), &pPin));
                 }
                 CheckNoLog(Connect(pPin, nullptr, false));
                 CComPtr<IPin> pPinTo;
@@ -1078,13 +1071,13 @@ HRESULT CFGManagerBDA::SetChannelInternal(CDVBChannel* pChannel)
 
         if (pChannel->GetVideoType() == DVB_H264) {
             UpdateMediaType(&vih2_H264, pChannel);
-            hr = pDemux->SetOutputPinMediaType(L"h264", const_cast<AM_MEDIA_TYPE*>(&mt_H264));
+            hr = pDemux->SetOutputPinMediaType(const_cast<LPWSTR>(L"h264"), const_cast<AM_MEDIA_TYPE*>(&mt_H264));
         } else if (pChannel->GetVideoType() == DVB_HEVC) {
             UpdateMediaType(&vih2_HEVC, pChannel);
-            hr = pDemux->SetOutputPinMediaType(L"HEVC", const_cast<AM_MEDIA_TYPE*>(&mt_HEVC));
+            hr = pDemux->SetOutputPinMediaType(const_cast<LPWSTR>(L"HEVC"), const_cast<AM_MEDIA_TYPE*>(&mt_HEVC));
         } else {
             UpdateMediaType(&sMpv_fmt, pChannel);
-            hr = pDemux->SetOutputPinMediaType(L"mpv", const_cast<AM_MEDIA_TYPE*>(&mt_Mpv));
+            hr = pDemux->SetOutputPinMediaType(const_cast<LPWSTR>(L"mpv"), const_cast<AM_MEDIA_TYPE*>(&mt_Mpv));
         }
         if (m_nCurVideoType != pChannel->GetVideoType() || GetState() == State_Stopped) {
             if (s.nDVBStopFilterGraph == DVB_STOP_FG_WHEN_SWITCHING && GetState() != State_Stopped) {
@@ -1193,16 +1186,16 @@ HRESULT CFGManagerBDA::SwitchStream(DVB_STREAM_TYPE nOldType, DVB_STREAM_TYPE nN
 
             switch (nNewType) {
                 case DVB_MPA:
-                    hr = pDemux->SetOutputPinMediaType(L"mpa", const_cast<AM_MEDIA_TYPE*>(&mt_Mpa));
+                    hr = pDemux->SetOutputPinMediaType(const_cast<LPWSTR>(L"mpa"), const_cast<AM_MEDIA_TYPE*>(&mt_Mpa));
                     break;
                 case DVB_AC3:
-                    hr = pDemux->SetOutputPinMediaType(L"ac3", const_cast<AM_MEDIA_TYPE*>(&mt_Ac3));
+                    hr = pDemux->SetOutputPinMediaType(const_cast<LPWSTR>(L"ac3"), const_cast<AM_MEDIA_TYPE*>(&mt_Ac3));
                     break;
                 case DVB_EAC3:
-                    hr = pDemux->SetOutputPinMediaType(L"eac3", const_cast<AM_MEDIA_TYPE*>(&mt_Eac3));
+                    hr = pDemux->SetOutputPinMediaType(const_cast<LPWSTR>(L"eac3"), const_cast<AM_MEDIA_TYPE*>(&mt_Eac3));
                     break;
                 case DVB_LATM:
-                    hr = pDemux->SetOutputPinMediaType(L"latm", const_cast<AM_MEDIA_TYPE*>(&mt_latm));
+                    hr = pDemux->SetOutputPinMediaType(const_cast<LPWSTR>(L"latm"), const_cast<AM_MEDIA_TYPE*>(&mt_latm));
                     break;
             }
         }

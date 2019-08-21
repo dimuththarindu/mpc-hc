@@ -3,7 +3,7 @@
 # This file is distributed under the same license as the MPC-HC package.
 # Translators:
 # B512, 2015
-# reneweesp <bmom43@hotmail.com>, 2016
+# reneweesp <bmom43@hotmail.com>, 2016-2017
 # Dennis Gerritsen <frostflame@hotmail.com>, 2014
 # Devrim, 2013-2015
 # DennisW, 2014
@@ -12,8 +12,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: MPC-HC\n"
-"POT-Creation-Date: 2016-04-11 21:52:56+0000\n"
-"PO-Revision-Date: 2016-11-12 00:53+0000\n"
+"POT-Creation-Date: 2017-07-29 17:00:42+0000\n"
+"PO-Revision-Date: 2017-08-05 15:09+0000\n"
 "Last-Translator: reneweesp <bmom43@hotmail.com>\n"
 "Language-Team: Dutch (http://www.transifex.com/mpc-hc/mpc-hc/language/nl/)\n"
 "MIME-Version: 1.0\n"
@@ -343,7 +343,7 @@ msgid "Remember last window size"
 msgstr "Vensterafmetingen onthouden"
 
 msgctxt "IDD_PPAGEPLAYER_IDC_CHECK11"
-msgid "Remember last Pan-n-Scan Zoom"
+msgid "Remember last Pan && Scan Zoom"
 msgstr "Onthoud de laatste Pan en Scan Zoom"
 
 msgctxt "IDD_PPAGEDVD_IDC_STATIC"
@@ -843,8 +843,8 @@ msgid "OK"
 msgstr "&OK"
 
 msgctxt "IDD_PNSPRESET_DLG_CAPTION"
-msgid "Pan&Scan Presets"
-msgstr "Pan&Scan profielen"
+msgid "Pan & Scan Presets"
+msgstr "Pan & Scan profielen"
 
 msgctxt "IDD_PNSPRESET_DLG_IDC_BUTTON2"
 msgid "New"
@@ -1161,10 +1161,6 @@ msgstr "Alternatieve VSync"
 msgctxt "IDD_PPAGEOUTPUT_IDC_DSVMR9LOADMIXER"
 msgid "VMR-9 Mixer Mode"
 msgstr "VMR-9 mixer mode"
-
-msgctxt "IDD_PPAGEOUTPUT_IDC_DSVMR9YUVMIXER"
-msgid "YUV Mixing"
-msgstr "YUV mixen"
 
 msgctxt "IDD_PPAGEOUTPUT_IDC_EVR_BUFFERS_TXT"
 msgid "EVR Buffers:"
@@ -1588,11 +1584,11 @@ msgstr "Online zoeken, ophalen en versturen ondertitels"
 
 msgctxt "IDD_PPAGESUBMISC_IDC_CHECK4"
 msgid "Automatically search and download subtitles if none are found locally"
-msgstr "Automatisch zoeken en ophalen van ondertitels als die lokaal niet worden gevonden."
+msgstr "Automatisch zoeken en ophalen van ondertitels indien lokaal niet gevonden."
 
 msgctxt "IDD_PPAGESUBMISC_IDC_CHECK5"
 msgid "Prefer subtitles for hearing impaired (when indicated by subtitles provider)"
-msgstr "Liever ondertitels voor slechthorenden (wanneer aangegeven door ondertitel verzorger)"
+msgstr "Liever ondertitels voor slechthorenden (indien aangegeven)"
 
 msgctxt "IDD_PPAGESUBMISC_IDC_STATIC1"
 msgid "Ignore files containing any of the following word(s):"
@@ -1741,6 +1737,10 @@ msgstr "Afgeknepen:"
 msgctxt "IDD_PPAGEAUDIORENDERER_IDC_STATIC3"
 msgid "Level:"
 msgstr "Hoogte:"
+
+msgctxt "IDD_PPAGEAUDIORENDERER_IDC_CHECK4"
+msgid "Ignore system channel mixer (always ignored in exclusive WASAPI mode)"
+msgstr ""
 
 msgctxt "IDD_PPAGEAUDIORENDERER_IDC_STATIC"
 msgid "Note"
